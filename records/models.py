@@ -109,9 +109,16 @@ class DKIMRecord(Record):
 
 def toOctalString(value):
     return "\%s\%s" % (
-        "{0:0>3o}".format(int(9999/256.0)),
-        "{0:0>3o}".format(int(9999%256))
+        "{0:0>3o}".format(int(value/256.0)),
+        "{0:0>3o}".format(int(value%256))
         )
+
+def toLabelString(value):
+    labels = value.split ( "." ) ;
+    result = ""
+    for value in labels:
+        result += "\\" + "{0:0>3o}".format(len(value)) + value
+    return result + r'\000'  ;
 
 class XMPPRecord(Record):
     #'fqdn:s:ttl:
@@ -125,32 +132,35 @@ class XMPPRecord(Record):
     
     def toData(self):
         result = [
-                u":_jabber._tcp.%(subdomain)s%(zone)s:33:%(priority)s:%(weight)s:%(port)s\\006%(destination)s\\000" % {
+                u":_jabber._tcp.%(subdomain)s%(zone)s:33:%(priority)s%(weight)s%(port)s%(destination)s:%(ttl)s:" % {
                     'subdomain': '' if self.subdomain == '' else self.subdomain+'.',
                     'zone':self.zone.name,
                     'priority': toOctalString(self.priority),
                     'weight': toOctalString(self.weight),
                     'port' : toOctalString(self.s2s_port),
-                    'destination' : self.destination
+                    'destination' : toLabelString(self.destination),
+                    'ttl': self.ttl
                 },
-                u":_xmpp-server._tcp.%(subdomain)s%(zone)s:33:%(priority)s:%(weight)s:%(port)s\\006%(destination)s\\000" % {
+                u":_xmpp-server._tcp.%(subdomain)s%(zone)s:33:%(priority)s%(weight)s%(port)s%(destination)s:%(ttl)s:" % {
                     'subdomain': '' if self.subdomain == '' else self.subdomain+'.',
                     'zone':self.zone.name,
                     'priority': toOctalString(self.priority),
                     'weight': toOctalString(self.weight),
                     'port' : toOctalString(self.s2s_port),
-                    'destination' : self.destination
+                    'destination' : toLabelString(self.destination),
+                    'ttl': self.ttl
                 },
-                u":_xmpp-client._tcp.%(subdomain)s%(zone)s:33:%(priority)s:%(weight)s:%(port)s\\006%(destination)s\\000" % {
+                u":_xmpp-client._tcp.%(subdomain)s%(zone)s:33:%(priority)s%(weight)s%(port)s%(destination)s:%(ttl)s:" % {
                     'subdomain': '' if self.subdomain == '' else self.subdomain+'.',
                     'zone':self.zone.name,
                     'priority': toOctalString(self.priority),
                     'weight': toOctalString(self.weight),
                     'port' : toOctalString(self.c2s_port),
-                    'destination' : self.destination
+                    'destination' : toLabelString(self.destination),
+                    'ttl': self.ttl
                 }
             ]
-        
+        return '\n'.join(result)
 
 
 class TXTRecord(Record):

@@ -23,7 +23,7 @@ def push(sender, instance, signal, *args, **kwargs):
         
     temp.close()
     
-   
+"""   
 models.signals.post_save.connect(push, sender=ARecord)
 models.signals.post_save.connect(push, sender=CNAMERecord)
 models.signals.post_save.connect(push, sender=MXRecord)
@@ -31,4 +31,6 @@ models.signals.post_save.connect(push, sender=NSRecord)
 models.signals.post_save.connect(push, sender=SPFRecord)
 models.signals.post_save.connect(push, sender=DKIMRecord)
 models.signals.post_save.connect(push, sender=TXTRecord) 
+models.signals.post_save.connect(push, sender=XMPPRecord) 
 models.signals.post_save.connect(push, sender=Zone)
+"""

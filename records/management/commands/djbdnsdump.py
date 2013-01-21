@@ -3,7 +3,9 @@ from records.models import *
   
 class Command(NoArgsCommand):
     help = "Dump djbdns file"
-  
+    
     def handle_noargs(self, **options):
+        data = ""
         for zone in Zone.objects.all():
-            print zone.toData();
+            data+=zone.toData();
+        print data
